@@ -1,14 +1,17 @@
 #!/bin/bash
 
-CAMINHO_BACKUP=/home/rafael/backup_amazon
+CAMINHO_BACKUP=/home/rafael/backup_mutillidae_amazon
 cd $CAMINHO_BACKUP
-if [ ! -d $(date +%F) ]
+data=$(date +%F)
+if [ ! -d $data ]
 then
-	mkdir $(date +%F)
+	mkdir $data
 fi
 
 tabelas=$(mysql -u root mutillidae -e "show tables;" | grep -v Tables)
 for tabela in $tabelas
 do
-	mysqldump -u root mutillidae $tabela > $CAMINHO_BACKUP/$(date +%F)/$tabela.sql
+	mysqldump -u root mutillidae $tabela > $CAMINHO_BACKUP/$data/$tabela.sql
 done
+
+aws s3 sync $CAMINHO_BACKUP s3://curso-shell-script
